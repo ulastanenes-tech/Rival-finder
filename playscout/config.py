@@ -47,3 +47,8 @@ DEFAULT_WEIGHTS = {
 MIN_REVIEW_SAMPLE = 30  # Bu sayının altındaki yorum örneği "düşük örneklem" sayılır
 NEW_APP_MONTHS = 6      # "Yeni yayınlanmış" filtresi için pencere
 STALE_DAYS = 30         # Bu günden eski kayıtlar "eski veri" olarak işaretlenir
+
+# Alaka eşiği (keşif modu). Türetilmiş bir terim (alt niş/eş anlamlı/modifikatör) tam geçerse
+# keywords.relevance bunu en az 0.6 yapar; yani bu eşik her zaman bu tür eşleşmeyi kabul eder.
+# Tam eşleşme (exact) modu ise eşiği değil, niş metninin tamamını ister (pipeline.py).
+RELEVANCE_THRESHOLD = 0.5

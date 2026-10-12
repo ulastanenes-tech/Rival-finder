@@ -11,6 +11,9 @@
 - Aşama 7: CSV/JSON dışa aktarma, yedek, karşılaştırma, hata yönetimi.
 - Aşama 8: 63 test, örnek çıktılar, kurulum belgesi (kısmi: performans ölçümü yapılmadı).
 
+## Alaka eşiği (kapatıldı)
+`config.RELEVANCE_THRESHOLD = 0.5` tek kaynaktır. Keşif modunda `score >= 0.5` veya türetilmiş terim eşleşmesi; tam eşleşmede tüm niş metni.
+
 ## Kalan / sonraki adımlar
 1. **Canlı doğrulama:** Kullanıcının makinesinde `python -m playscout doctor --network` ve birkaç gerçek tohumla
    uçtan uca çalıştırma. Sandbox'ta Play/AppBrain'e erişim olmadığı için bu adım yapılamadı.

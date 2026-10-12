@@ -127,7 +127,7 @@ def run_search(conn, params, fetcher=None, progress=None, today=None):
         rel_terms = _relevance_terms(keyword_terms, mode)
         score, matched = kw.relevance(rel_terms, app["title"], app.get("description") or "", app.get("description") or "",
                                       app.get("category"))
-        ok = score >= 0.999 if mode == "exact" else score >= 0.5 or bool(matched)
+        ok = score >= 0.999 if mode == "exact" else score >= config.RELEVANCE_THRESHOLD or bool(matched)
         if not ok:
             excluded["alaka_uyumsuz"] += 1
             continue
@@ -148,7 +148,7 @@ def run_search(conn, params, fetcher=None, progress=None, today=None):
                     continue
                 s, m = kw.relevance(bterms, app["title"], app.get("description") or "", app.get("description") or "",
                                     app.get("category"))
-                if s >= 0.5 or m:
+                if s >= config.RELEVANCE_THRESHOLD or m:
                     found.append((pkg, "fallback", s))
             for b in broad:
                 conn.execute("INSERT OR IGNORE INTO Keywords(run_id, term, mode, origin) VALUES (?,?,?,?)",

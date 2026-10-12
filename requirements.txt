@@ -1,0 +1,1 @@
+# Bağımlılık yok: PlayScout yalnızca Python 3.10+ standart kütüphanesini kullanır.

@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PlayScout — Google Play Rakip Araştırma</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<header class="top">
+  <div class="brand">PlayScout <span class="ver" id="ver"></span></div>
+  <div class="status" id="status">Bağlanıyor…</div>
+</header>
+<div class="notice" id="notice" hidden></div>
+
+<main class="layout">
+  <section class="panel search" aria-labelledby="s-title">
+    <h2 id="s-title">Araştırma</h2>
+    <form id="searchForm" autocomplete="off">
+      <label class="field wide">Niş / anahtar kelime
+        <input id="niche" name="niche" placeholder="örn. AI photo editor" maxlength="100" required>
+      </label>
+      <fieldset class="field wide mode">
+        <legend>Mod</legend>
+        <label><input type="radio" name="mode" value="exact" checked> Tam eşleşme (yalnızca bu niş)</label>
+        <label><input type="radio" name="mode" value="discovery"> Niş keşfi (alt nişler, eş anlamlılar)</label>
+      </fieldset>
+      <div class="field wide">
+        <div class="row-between"><span>Anahtar kelimeler (düzenlenebilir)</span>
+          <button type="button" class="ghost" id="btnKw">Öner</button></div>
+        <textarea id="keywords" rows="3" placeholder="Boş bırakırsanız modla birlikte otomatik üretilir. Virgülle ayırın."></textarea>
+      </div>
+      <label class="field wide">Tohum uygulamalar (paket adı veya Google Play / AppBrain bağlantısı)
+        <textarea id="seeds" rows="3" placeholder="com.photoroom.app&#10;https://play.google.com/store/apps/details?id=com.picsart.studio"></textarea>
+        <small>Google Play ve AppBrain arama sayfaları robots.txt ile yasaklı olduğundan niş araması doğrudan oradan yapılmaz. Arama sonuçlarını tarayıcınızda açıp bağlantılarını buraya yapıştırın.</small>
+      </label>
+      <div class="grid2">
+        <label class="field">Ülke (Play mağaza bölgesi)<input id="country" value="US" maxlength="2"></label>
+        <label class="field">Sonuç sayısı
+          <select id="limit"><option>10</option><option selected>25</option><option>50</option><option>100</option></select></label>
+        <label class="field">Tarih (ilk yayın)
+          <select id="datePreset"></select></label>
+        <label class="field">Sıralama
+          <select id="sort"></select></label>
+        <label class="field">Başlangıç <input type="date" id="dateFrom"></label>
+        <label class="field">Bitiş <input type="date" id="dateTo"></label>
+        <label class="field">Minimum indirme
+          <select id="minDl"></select></label>
+        <label class="field">Maksimum indirme
+          <select id="maxDl"></select></label>
+        <label class="field">Puan min <input type="number" step="0.1" min="0" max="5" id="minRating" placeholder="3.5"></label>
+        <label class="field">Puan max <input type="number" step="0.1" min="0" max="5" id="maxRating" placeholder="4.4"></label>
+        <label class="field">Minimum yorum <input type="number" min="0" id="minReviews" placeholder="100"></label>
+        <label class="field">Aday üst sınırı <input type="number" min="1" max="200" id="maxCandidates" value="40"></label>
+      </div>
+      <label class="check"><input type="checkbox" id="includeUnknown"> Tarihi bilinmeyenleri de dâhil et</label>
+      <label class="check"><input type="checkbox" id="offline"> Çevrimdışı: yalnızca kayıtlı verileri analiz et (ağ yok)</label>
+      <div class="actions">
+        <button type="submit" class="primary" id="btnRun">Araştırmayı başlat</button>
+        <button type="button" class="ghost" id="btnRerun" title="Son araştırmanın ayarlarıyla yeniden tara">Aynı nişi yeniden tara</button>
+      </div>
+      <div class="progress" id="progress" hidden><div class="bar"><span id="bar"></span></div><div id="progressText"></div></div>
+    </form>
+  </section>
+
+  <section class="panel filters" aria-labelledby="f-title">
+    <div class="row-between"><h2 id="f-title">Filtreler</h2>
+      <button class="ghost" id="btnResetFilters" type="button">Filtreleri sıfırla</button></div>
+    <div class="filter-grid" id="filterGrid"></div>
+    <details><summary>Fırsat puanı ağırlıkları</summary>
+      <div class="filter-grid" id="weightGrid"></div>
+      <small>Ağırlıklar 100'e normalize edilir. Değişiklikten sonra araştırmayı yeniden çalıştırın.</small>
+    </details>
+    <details><summary>Veri kaynakları ve kurallar</summary><div id="sourcesBox"></div></details>
+  </section>
+
+  <section class="panel results" aria-labelledby="r-title">
+    <div class="row-between wrap">
+      <h2 id="r-title">Sonuçlar</h2>
+      <div class="toolbar">
+        <select id="savedRuns" title="Önceki araştırmayı yeniden aç"></select>
+        <button class="ghost" id="btnView">Kart görünümü</button>
+        <button class="ghost" id="btnCsv">CSV</button>
+        <button class="ghost" id="btnJson">JSON</button>
+        <button class="ghost" id="btnCompare">Karşılaştırmaya ekle (<span id="cmpCount">0</span>)</button>
+        <button class="ghost" id="btnShowCmp">Karşılaştırmalar</button>
+      </div>
+    </div>
+    <div id="counts" class="counts"></div>
+    <div id="shortfall" class="shortfall" hidden></div>
+    <details id="explainBox"><summary>Filtre eleme açıklaması</summary><div id="explain"></div></details>
+    <div class="search-in-table"><input id="tableFilter" placeholder="Tabloda ara (ad, paket, geliştirici)"></div>
+    <div id="resultsView"></div>
+  </section>
+</main>
+
+<div class="modal" id="drawer" hidden role="dialog" aria-modal="true" aria-labelledby="d-title">
+  <div class="modal-body">
+    <button class="close" id="btnClose" aria-label="Kapat">×</button>
+    <div id="drawerContent"></div>
+  </div>
+</div>
+
+<div class="modal" id="cmpModal" hidden role="dialog" aria-modal="true">
+  <div class="modal-body">
+    <button class="close" id="btnCmpClose" aria-label="Kapat">×</button>
+    <div id="cmpContent"></div>
+  </div>
+</div>
+
+<script src="/static/app.js"></script>
+</body>
+</html>

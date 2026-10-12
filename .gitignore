@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+data/
+.venv/
+node_modules/
+*.db-wal
+*.db-shm
